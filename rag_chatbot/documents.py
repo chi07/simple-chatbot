@@ -99,12 +99,24 @@ def _read_file(path: Path) -> str:
 
 def _read_pdf(path: Path) -> str:
     reader = PdfReader(str(path))
+    metadata_parts = []
+    metadata = reader.metadata or {}
+    title = metadata.get("/Title")
+    author = metadata.get("/Author")
+    if title:
+        metadata_parts.append(f"PDF title: {title}")
+    if author:
+        metadata_parts.append(f"PDF author: {author}")
+
     pages: list[str] = []
     for index, page in enumerate(reader.pages, start=1):
         text = page.extract_text() or ""
         if text.strip():
             pages.append(f"\n\n[Page {index}]\n{text}")
-    return "\n".join(pages)
+
+    prefix = "\n".join(metadata_parts)
+    body = "\n".join(pages)
+    return "\n\n".join(part for part in [prefix, body] if part)
 
 
 def _stable_chunk_id(source: str, chunk_index: int, text: str) -> str:

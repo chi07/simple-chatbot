@@ -1,4 +1,4 @@
-PYTHON ?= python3
+PYTHON ?= $(shell command -v python3.13 2>/dev/null || command -v python3.12 2>/dev/null || command -v python3.11 2>/dev/null || command -v python3)
 VENV := .venv
 BIN := $(VENV)/bin
 APP_PORT ?= 8080
@@ -8,6 +8,7 @@ APP_PORT ?= 8080
 help:
 	@echo "Available targets:"
 	@echo "  make install      Create virtualenv and install dependencies"
+	@echo "                    Override Python with: make install PYTHON=python3.12"
 	@echo "  make qdrant-up    Start Qdrant with Docker Compose"
 	@echo "  make ingest       Ingest documents from data/docs into Qdrant"
 	@echo "  make run          Run the FastAPI server"
@@ -17,6 +18,7 @@ help:
 	@echo "  make clean        Remove Python cache files"
 
 venv:
+	@echo "Using Python: $(PYTHON)"
 	$(PYTHON) -m venv $(VENV)
 
 install: venv
